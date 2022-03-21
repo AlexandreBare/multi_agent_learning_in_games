@@ -122,8 +122,8 @@ def plot_egt_dynamics(game,
     ax = plt.subplot(projection=projection)
     ax.quiver(dyn, **args_quiver)
     if projection == "2x2":
-        plt.xlabel(state.action_to_string(0))
-        plt.ylabel(state.action_to_string(1))
+        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
+        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
     else:
         ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
 
@@ -145,8 +145,8 @@ def plot_egt_dynamics(game,
     ax = plt.subplot(projection=projection)
     ax.streamplot(dyn, **args_streamplot)
     if projection == "2x2":
-        plt.xlabel(state.action_to_string(0))
-        plt.ylabel(state.action_to_string(1))
+        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
+        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
     else:
         ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
     if lenient:
@@ -161,6 +161,29 @@ def plot_egt_dynamics(game,
             fig.savefig(dir + "trajectory_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
         else:
             fig.savefig(dir + "trajectory_" + game_name_small + ".png")
+
+    fig = plt.figure()
+    ax = plt.subplot(projection=projection)
+    ax.quiver(dyn, **args_quiver)
+    ax.streamplot(dyn, **args_streamplot)
+    if projection == "2x2":
+        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
+        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
+    else:
+        ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
+    if lenient:
+        plt.title("Dynamics for " + game_name + "\n(" + f"tries={tries}" + ", " + f"temperature={temperature}" + ")")
+    else:
+        plt.title("Dynamics for " + game_name)
+
+    plt.show()
+
+    if save_output:
+        if lenient:
+            fig.savefig(
+                dir + "dynamics_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
+        else:
+            fig.savefig(dir + "dynamics_" + game_name_small + ".png")
 
 
 def main(args):
@@ -209,7 +232,7 @@ if __name__ == '__main__':
     args_parser = argparse.ArgumentParser()
     # 'Biased Rock Paper Scissors', 'Dispersion Game', 'Battle of the Sexes', 'Subsidy Game'
     args_parser.add_argument('--game_name', help='Name of the game to play',
-                             default='Dispersion Game', type=str)
+                             default='Subsidy Game', type=str)
     args_parser.add_argument('--save_output', help='Whether we save the output figures',
                              default=True, type=bool)
     args = args_parser.parse_args()
