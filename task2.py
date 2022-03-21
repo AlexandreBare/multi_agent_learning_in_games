@@ -69,19 +69,20 @@ def load_game(game_name):
     return game
 
 
-def train_agents(agents, env, training_episodes):
-    # Train the agents
-    for cur_episode in range(training_episodes):
-        time_step = env.reset()
-        while not time_step.last():
-            player_id = time_step.observations["current_player"]
-            agent_output = agents[player_id].step(time_step)
-            time_step = env.step([agent_output.action])
-        # Episode is over, step all agents with final info state.
-        for agent in agents:
-            agent.step(time_step)
-
-    return agents
+# def train_agents(agents, env, training_episodes):
+#     # Train the agents
+#     for cur_episode in range(training_episodes):
+#         time_step = env.reset()
+#         while not time_step.last():
+#             player_id = time_step.observations["current_player"]
+#             agent_output = agents[player_id].step(time_step)
+#             time_step = env.step([agent_output.action])
+#
+#         # Episode is over, step all agents with final info state.
+#         for agent in agents:
+#             agent.step(time_step)
+#
+#     return agents
 
 def train_agents_1(agents, env, training_episodes):
     for cur_episode in range(training_episodes):
@@ -137,58 +138,58 @@ def plot_egt_dynamics(game,
 
     state = game.new_initial_state()
 
-
-    fig = plt.figure()
-    ax = plt.subplot(projection=projection)
-    ax.quiver(dyn, **args_quiver)
-    if projection == "2x2":
-        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
-        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
-    else:
-        ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
-
-    if lenient:
-        plt.title("Directional Field Plot for " + game_name + "\n(" + f"tries={tries}" + ", " + f"temperature={temperature}" + ")")
-    else:
-        plt.title("Directional Field Plot for " + game_name)
-    plt.show()
-
     dir = OUTPUT_DIR + game_name_small + "/"
-    if save_output:
-        if lenient:
-            fig.savefig(dir + "directional_field_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
-        else:
-            fig.savefig(dir + "directional_field_" + game_name_small + ".png")
 
-
-    fig = plt.figure()
-    ax = plt.subplot(projection=projection)
-    ax.streamplot(dyn, **args_streamplot)
-    if projection == "2x2":
-        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
-        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
-    else:
-        ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
-    if lenient:
-        plt.title("Trajectory for " + game_name + "\n(" + f"tries={tries}" + ", " + f"temperature={temperature}" + ")")
-    else:
-        plt.title("Trajectory for " + game_name)
-
-    plt.show()
-
-    if save_output:
-        if lenient:
-            fig.savefig(dir + "trajectory_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
-        else:
-            fig.savefig(dir + "trajectory_" + game_name_small + ".png")
+    # fig = plt.figure()
+    # ax = plt.subplot(projection=projection)
+    # ax.quiver(dyn, **args_quiver)
+    # if projection == "2x2":
+    #     plt.xlabel(f"Player 0 playing {state.action_to_string(0)}")
+    #     plt.ylabel(f"Player 1 playing {state.action_to_string(0)}")
+    # else:
+    #     ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
+    #
+    # if lenient:
+    #     plt.title("Directional Field Plot for " + game_name + "\n(" + f"tries={tries}" + ", " + f"temperature={temperature}" + ")")
+    # else:
+    #     plt.title("Directional Field Plot for " + game_name)
+    # plt.show()
+    #
+    # if save_output:
+    #     if lenient:
+    #         fig.savefig(dir + "directional_field_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
+    #     else:
+    #         fig.savefig(dir + "directional_field_" + game_name_small + ".png")
+    #
+    #
+    # fig = plt.figure()
+    # ax = plt.subplot(projection=projection)
+    # ax.streamplot(dyn, **args_streamplot)
+    # if projection == "2x2":
+    #     plt.xlabel(f"Player 0 playing {state.action_to_string(0)}")
+    #     plt.ylabel(f"Player 1 playing {state.action_to_string(0)}")
+    # else:
+    #     ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
+    # if lenient:
+    #     plt.title("Trajectory for " + game_name + "\n(" + f"tries={tries}" + ", " + f"temperature={temperature}" + ")")
+    # else:
+    #     plt.title("Trajectory for " + game_name)
+    #
+    # plt.show()
+    #
+    # if save_output:
+    #     if lenient:
+    #         fig.savefig(dir + "trajectory_" + game_name_small + f"_tries={tries}" + "_" + f"temperature={temperature}" + ".png")
+    #     else:
+    #         fig.savefig(dir + "trajectory_" + game_name_small + ".png")
 
     fig = plt.figure()
     ax = plt.subplot(projection=projection)
     ax.quiver(dyn, **args_quiver)
     ax.streamplot(dyn, **args_streamplot)
     if projection == "2x2":
-        plt.xlabel(f"Player 1 playing {state.action_to_string(0)}")
-        plt.ylabel(f"Player 2 playing {state.action_to_string(0)}")
+        plt.xlabel(f"Player 0 playing {state.action_to_string(0)}")
+        plt.ylabel(f"Player 1 playing {state.action_to_string(0)}")
     else:
         ax.set_labels([state.action_to_string(i) for i in range(game.num_distinct_actions())])
     if lenient:
@@ -205,9 +206,10 @@ def plot_egt_dynamics(game,
         else:
             fig.savefig(dir + "dynamics_" + game_name_small + ".png")
 
+
 def task2_training(env, agents):
     # Training
-    epoch = 10
+    epoch = 1
     epoch_num = 10
 
     for e in range(epoch_num):
@@ -293,7 +295,7 @@ if __name__ == '__main__':
     args_parser = argparse.ArgumentParser()
     # 'Biased Rock Paper Scissors', 'Dispersion Game', 'Battle of the Sexes', 'Subsidy Game'
     args_parser.add_argument('--game_name', help='Name of the game to play',
-                             default='Subsidy Game', type=str)
+                             default='Dispersion Game', type=str)
     args_parser.add_argument('--save_output', help='Whether we save the output figures',
                              default=True, type=bool)
     args = args_parser.parse_args()
