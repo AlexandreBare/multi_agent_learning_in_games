@@ -65,7 +65,7 @@ def load_game(game_name):
                                       actions,
                                       payoff_matrix_player_0,
                                       payoff_matrix_player_1)
-    game = pyspiel.convert_to_turn_based(game)
+    # game = pyspiel.convert_to_turn_based(game)
     return game
 
 
@@ -82,6 +82,26 @@ def train_agents(agents, env, training_episodes):
             agent.step(time_step)
 
     return agents
+
+def train_agents_1(agents, env, training_episodes):
+    for cur_episode in range(training_episodes):
+        time_step = env.reset()
+
+        agent_outputs = []
+
+        for agent in agents:
+            id = agent._player_id
+            agent_outputs.append(agents[id].step(time_step).action)
+
+        time_step = env.step(agent_outputs)
+
+        # print("last? " + str(time_step.last()))
+
+        for agent in agents:
+            agent.step(time_step)
+    
+    return agents
+
 
 
 def plot_egt_dynamics(game,
@@ -185,8 +205,29 @@ def plot_egt_dynamics(game,
         else:
             fig.savefig(dir + "dynamics_" + game_name_small + ".png")
 
+def task2_training(env, agents):
+    # Training
+    epoch = 10
+    epoch_num = 10
 
-def main(args):
+    for e in range(epoch_num):
+
+        agents = train_agents_1(agents, env, epoch)
+        # Play Time !
+        print("batch: " + str(e))
+        time_step = env.reset()
+        agent_output = agents[0].step(time_step, is_evaluation=True)
+        print("Agent 0: ", agent_output)
+        print("q_values: " + str(dict(agents[0]._q_values['[0.0]'])))
+
+        agent_output = agents[1].step(time_step, is_evaluation=True)
+        print("Agent 1: ", agent_output)
+        print("q_values: " + str(dict(agents[1]._q_values['[0.0]'])))
+
+        print("")
+
+
+def task2_rl(args):
     np.random.seed(42)
     num_players = 2
     game = load_game(args.game_name)
@@ -194,27 +235,39 @@ def main(args):
     num_actions = env.action_spec()["num_actions"]
 
     # Initial state
-    policy = policy_lib.TabularPolicy(game)
+    turn_based_game = pyspiel.convert_to_turn_based(game)
+    # turn_based_game = game
+    policy = policy_lib.TabularPolicy(turn_based_game)
     print(policy.states_per_player)
     print("Initial Action Probability Array:\n", policy.action_probability_array)
-    print("Nash Conv: ", exploitability.nash_conv(game, policy))
+    print("Nash Conv: ", exploitability.nash_conv(turn_based_game, policy))
+
     agents = [
         tabular_qlearner.QLearner(player_id=player_id, num_actions=num_actions)
         for player_id in range(num_players)
     ]
 
-    # Training
-    training_episodes = 1000
-    agents = train_agents(agents, env, training_episodes)
+    task2_training(env, agents)
 
-    # Play Time !
-    time_step = env.reset()
-    agent_output = agents[0].step(time_step, is_evaluation=True)
-    print("Agent 0: ", agent_output)
-    time_step = env.step([agent_output.action])
-    agent_output = agents[1].step(time_step, is_evaluation=True)
-    time_step = env.step([agent_output.action])
-    print("Agent 1: ", agent_output)
+    # # Training
+    # training_episodes = 1000
+    # agents = train_agents(agents, env, training_episodes)
+
+    # # Play Time !
+    # time_step = env.reset()
+    # agent_output = agents[0].step(time_step, is_evaluation=True)
+    # print("Agent 0: ", agent_output)
+    # time_step = env.step([agent_output.action])
+    # agent_output = agents[1].step(time_step, is_evaluation=True)
+    # time_step = env.step([agent_output.action])
+    # print("Agent 1: ", agent_output)
+
+
+def task2_dynamics(args):
+    game = load_game(args.game_name)
+    game = pyspiel.convert_to_turn_based(game)
+    env = rl_environment.Environment(game)
+    num_actions = env.action_spec()["num_actions"]
 
     # Replicator Dynamics
     plot_egt_dynamics(game, dynamics_func=dynamics.replicator, save_output=args.save_output)
@@ -226,6 +279,14 @@ def main(args):
                       tries=5,
                       lenient=True,
                       save_output=args.save_output)
+
+
+def main(args):
+    task2_rl(args)
+    task2_dynamics(args)
+
+
+
 
 
 if __name__ == '__main__':
