@@ -277,7 +277,7 @@ def task2_dynamics(args):
     # Lenient Boltzmann Q Dynamics
     plot_egt_dynamics(game,
                       dynamics_func=dynamics.boltzmannq,
-                      temperature=1.,
+                      temperature=1.0,
                       tries=5,
                       lenient=True,
                       save_output=args.save_output)
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     args_parser = argparse.ArgumentParser()
     # 'Biased Rock Paper Scissors', 'Dispersion Game', 'Battle of the Sexes', 'Subsidy Game'
     args_parser.add_argument('--game_name', help='Name of the game to play',
-                             default='Dispersion Game', type=str)
+                             default='Subsidy Game', type=str)
     args_parser.add_argument('--save_output', help='Whether we save the output figures',
                              default=True, type=bool)
     args = args_parser.parse_args()
