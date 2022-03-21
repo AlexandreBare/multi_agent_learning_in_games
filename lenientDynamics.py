@@ -113,10 +113,7 @@ class MultiPopulationLenientDynamics(MultiPopulationDynamics):
         states = np.split(state, np.cumsum(ks)[:-1])
         dstates = [None] * n
         for i in range(n):
-            print("\n\n")
-            print(self.payoff_tensor[i])
             payoff_matrix = np.moveaxis(self.payoff_tensor[i], i, 0)
-            print(payoff_matrix)
             utility = lenient_utility(self.tries, states[i], payoff_matrix)
 
             dstates[i] = self.dynamics[i](states[i], utility)
